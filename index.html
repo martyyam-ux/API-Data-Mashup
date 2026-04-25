@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Management Trainee Lead Capture</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #f4f7f6;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+        }
+        .form-container {
+            background-color: white;
+            padding: 30px;
+            border-radius: 8px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+            width: 350px;
+        }
+        h2 { color: #333; margin-top: 0; }
+        label { font-weight: bold; display: block; margin-top: 15px; font-size: 14px; }
+        input, select {
+            width: 100%;
+            padding: 10px;
+            margin-top: 5px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            box-sizing: border-box;
+        }
+        button {
+            width: 100%;
+            padding: 12px;
+            background-color: #0056b3;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            margin-top: 20px;
+            font-weight: bold;
+            cursor: pointer;
+        }
+        button:hover { background-color: #004494; }
+        button:disabled { background-color: #cccccc; cursor: not-allowed; }
+        
+        #statusMessage {
+            margin-top: 15px;
+            padding: 10px;
+            border-radius: 4px;
+            text-align: center;
+            display: none;
+            font-weight: bold;
+        }
+        .success { background-color: #d4edda; color: #155724; border: 1px solid #c3e6cb; }
+        .error { background-color: #f8d7da; color: #721c24; border: 1px solid #f5c6cb; }
+    </style>
+</head>
+<body>
+
+<div class="form-container">
+    <h2>Program Application</h2>
+    <form id="leadForm">
+        <label for="name">Full Name</label>
+        <input type="text" id="name" required placeholder="Jane Doe">
+
+        <label for="email">University Email</label>
+        <input type="email" id="email" required placeholder="jane@university.edu">
+
+        <label for="track">Target Management Track</label>
+        <select id="track" required>
+            <option value="Supply Chain">Supply Chain</option>
+            <option value="Marketing">Marketing</option>
+            <option value="Finance">Finance</option>
+            <option value="Human Resources">Human Resources</option>
+        </select>
+
+        <button type="submit" id="submitBtn">Submit Application</button>
+    </form>
+    
+    <div id="statusMessage"></div>
+</div>
+
+<script>
+    document.getElementById('leadForm').addEventListener('submit', async function(e) {
+        e.preventDefault();
+        
+        const btn = document.getElementById('submitBtn');
+        const statusDiv = document.getElementById('statusMessage');
+        
+        btn.disabled = true;
+        btn.innerText = "Processing...";
+        statusDiv.style.display = "none";
+        statusDiv.className = ""; 
+
+        const data = {
+            name: document.getElementById('name').value,
+            email: document.getElementById('email').value,
+            track: document.getElementById('track').value
+        };
+
+        try {
+            const response = await fetch('/submit', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(data)
+            });
+
+            const result = await response.json();
+
+            statusDiv.style.display = "block";
+            if (response.ok) {
+                statusDiv.innerText = result.message;
+                statusDiv.classList.add("success");
+                document.getElementById('leadForm').reset();
+            } else {
+                statusDiv.innerText = result.message;
+                statusDiv.classList.add("error");
+            }
+        } catch (error) {
+            statusDiv.style.display = "block";
+            statusDiv.innerText = "Network Error. Please try again.";
+            statusDiv.classList.add("error");
+        } finally {
+            // Reset the button
+            btn.disabled = false;
+            btn.innerText = "Submit Application";
+        }
+    });
+</script>
+
+</body>
+</html>

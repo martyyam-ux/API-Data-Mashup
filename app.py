@@ -22,7 +22,6 @@ def submit_to_notion():
         "Notion-Version": "2022-06-28"
     }
 
-    # Formatting the data exactly how Notion's API expects it
     payload = {
         "parent": {"database_id": DATABASE_ID},
         "properties": {
@@ -35,11 +34,9 @@ def submit_to_notion():
     try:
         response = requests.post(url, json=payload, headers=headers)
         
-        # If Notion accepts it, send a success message back to the webpage
         if response.status_code == 200:
             return jsonify({"status": "success", "message": "Lead captured successfully!"}), 200
         else:
-            # If Notion rejects it (e.g., bad API key), send an error
             return jsonify({"status": "error", "message": "Failed to connect to the database."}), 400
             
     except Exception as e:
